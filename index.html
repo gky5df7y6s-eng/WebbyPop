@@ -2,810 +2,1270 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>WebbyPop ✨ - AIコードをスマホで簡単アプリ化</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- URL圧縮共有用 (LZ-String) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WebbyPop ✨</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+    /* ========================================================
+       🎨 テーマ変数定義（指定カラーを厳格適用）
+       ======================================================== */
     :root {
-      /* [Light Mode] ロマンティック系 */
-      --bg-page: #FAF9FD;
+      /* 【ライトモード：白背景・ロマンティック系】 */
+      --bg-main: #FAF9FD;
       --bg-card: #FFFFFF;
-      --bg-card-sub: #F4F2FC;
-      --border-main: #E5E1F8;
-      --border-accent: #9B95EB;
+      --bg-sub: #F4F2FC;
       --text-main: #2E2979;
       --text-sub: #67619E;
       --text-muted: #9590BD;
-      
-      --c-accent1: #2E2979; /* ディープネイビー */
-      --c-accent2: #F39DF4; /* 明るいピンクパープル */
-      --c-accent3: #9B95EB; /* ラベンダー */
+      --border-color: #E5E1F8;
 
-      --header-bg: rgba(250, 249, 253, 0.88);
-      --code-bg: #211E48;
-      --btn-primary-bg: #F39DF4;
-      --btn-primary-text: #2E2979;
-      --device-border: #9B95EB;
+      /* 指定パーツカラー */
+      --c1: #2E2979; /* 濃紺・見出し・枠線 */
+      --c2: #F39DF4; /* ピンクパープル・主ボタン・強調 */
+      --c3: #9B95EB; /* ラベンダー・サブ枠線・アクセント */
+
+      --header-bg: rgba(250, 249, 253, 0.95);
+      --toast-bg: rgba(46, 41, 121, 0.94);
+      --toast-text: #FFFFFF;
+      --btn-text-on-c2: #2E2979;
+      --phone-outer: #000000;
     }
 
     body.dark-mode {
-      /* [Dark Mode] 黒背景・ネオン系 */
-      --bg-page: #181824;
-      --bg-card: #202030;
-      --bg-card-sub: #28283E;
-      --border-main: rgba(133, 135, 248, 0.24);
-      --border-accent: #8587F8;
+      /* 【ダークモード：黒背景・ネオン系】 */
+      --bg-main: #181824;
+      --bg-card: #222233;
+      --bg-sub: #2B2B3F;
       --text-main: #F5F5FA;
-      --text-sub: #BAC0E8;
-      --text-muted: #797EAA;
+      --text-sub: #B8B8D2;
+      --text-muted: #7E7E9E;
+      --border-color: #383852;
 
-      --c-accent1: #8587F8; /* パープルブルー */
-      --c-accent2: #FB76FB; /* ネオンライトピンク */
-      --c-accent3: #EC1278; /* ビビッドマゼンタ */
+      /* 指定パーツカラー */
+      --c1: #8587F8; /* パープルブルー・見出し・枠線 */
+      --c2: #FB76FB; /* ネオンライトピンク・ボタン・選択強調 */
+      --c3: #EC1278; /* ビビッドマゼンタ・重要アクション */
 
-      --header-bg: rgba(24, 24, 36, 0.88);
-      --code-bg: #12121B;
-      --btn-primary-bg: #EC1278;
-      --btn-primary-text: #FFFFFF;
-      --device-border: #8587F8;
+      --header-bg: rgba(24, 24, 36, 0.95);
+      --toast-bg: rgba(34, 34, 51, 0.96);
+      --toast-text: #FB76FB;
+      --btn-text-on-c2: #181824;
+      --phone-outer: #12121A;
     }
 
     body {
-      background-color: var(--bg-page);
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+      background-color: var(--bg-main);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans JP", sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
       transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    .theme-card {
-      background-color: var(--bg-card);
-      border-color: var(--border-main);
-    }
-    .theme-card-sub {
-      background-color: var(--bg-card-sub);
-    }
-
-    .font-mono-code {
-      font-family: 'JetBrains Mono', monospace;
-      tab-size: 2;
-    }
-
-    .glass-bar {
+    header {
+      position: sticky;
+      top: 0;
       background: var(--header-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      z-index: 100;
+      transition: all 0.25s ease;
     }
-
-    .chip-btn {
-      padding: 4px 10px;
-      border-radius: 20px;
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-main);
+    }
+    .pro-badge {
+      background: var(--c1);
+      color: #FFFFFF;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    
+    .header-btn {
+      background: var(--bg-sub);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
       font-size: 11px;
       font-weight: 600;
-      border: 1px solid var(--border-main);
-      background-color: var(--bg-card-sub);
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 記号だけのすっきりアイコンボタン */
+    .icon-only-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--bg-sub);
+      border-radius: 12px;
+      padding: 4px;
+      margin-top: 10px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid var(--border-color);
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
       color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    main {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      transition: all 0.25s ease;
+    }
+    .label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+    .group-title {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--c1);
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-sub);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+      border-color: var(--c2);
+    }
+    
+    .template-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .template-bar::-webkit-scrollbar { display: none; }
+    
+    .template-btn {
+      white-space: nowrap;
+      background: var(--bg-sub);
+      border: 1px dashed var(--c3);
+      padding: 5px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-main);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .palette-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .palette-tabs::-webkit-scrollbar { display: none; }
+    
+    .palette-tab-btn {
+      white-space: nowrap;
+      background: var(--bg-sub);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-sub);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .palette-tab-btn.active {
+      background: var(--c1);
+      border-color: var(--c1);
+      color: #FFFFFF;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .palette-item {
+      background: var(--bg-sub);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .palette-item.active {
+      border-color: var(--c2);
+      box-shadow: 0 0 0 2px var(--c2);
+    }
+    .palette-item.locked {
+      opacity: 0.5;
+      border-style: dashed;
+    }
+    .palette-name {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 4px;
+    }
+    .palette-dots {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .chip {
+      background: var(--bg-sub);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-sub);
+      cursor: pointer;
+      user-select: none;
       transition: all 0.15s ease;
     }
-    .chip-btn.active {
-      background-color: var(--c-accent2);
-      color: var(--btn-primary-text);
-      border-color: var(--c-accent2);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    .chip.active {
+      background: var(--c2);
+      border-color: var(--c2);
+      color: var(--btn-text-on-c2);
+    }
+
+    .preview-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .preview-frame-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .phone-mockup {
+      width: 100%;
+      max-width: 360px;
+      height: 600px;
+      background: var(--phone-outer);
+      border-radius: 40px;
+      padding: 10px;
+      border: 3px solid var(--c3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      transition: all 0.25s ease;
+    }
+    .phone-mockup.wide-mode {
+      max-width: 100%;
+      height: 65vh;
+      border-radius: 16px;
+      padding: 0;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      box-shadow: none;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      border-radius: 30px;
+      border: none;
+    }
+    .phone-mockup.wide-mode .phone-screen {
+      border-radius: 16px;
+    }
+
+    .action-btn {
+      width: 100%;
+      border: none;
+      background: var(--c2);
+      color: var(--btn-text-on-c2);
+      padding: 12px;
+      border-radius: 14px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+    }
+    .magic-btn {
+      background: linear-gradient(135deg, var(--c1), var(--c3));
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+    body.dark-mode .magic-btn {
+      background: linear-gradient(135deg, #EC1278, #8587F8);
+      color: #FFFFFF;
+    }
+
+    .action-btn:active, .chip:active, .tab-btn:active, .palette-item:active, .palette-tab-btn:active, .template-btn:active, .header-btn:active {
+      transform: scale(0.96);
+    }
+    
+    #toast {
+      position: fixed;
+      top: 55px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--toast-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--toast-text);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.18s ease;
+      z-index: 99999;
+      white-space: nowrap;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #api-help-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .help-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      max-width: 440px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      max-height: 85vh;
+      overflow-y: auto;
+      color: var(--text-main);
+    }
+    .step-box {
+      background: var(--bg-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--c1);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 4px;
     }
   </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body>
 
-  <!-- Top Navigation Header -->
-  <header class="sticky top-0 z-40 glass-bar border-b border-[var(--border-main)] px-4 pt-3 pb-2 transition-all">
-    <div class="max-w-xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-md" style="background: linear-gradient(135deg, var(--c-accent3), var(--c-accent2));">
-          <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
-        </div>
-        <div>
-          <h1 class="text-base font-extrabold tracking-tight leading-tight flex items-center gap-1.5 text-[var(--text-main)]">
-            WebbyPop
-            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full border" style="background-color: var(--bg-card-sub); color: var(--c-accent2); border-color: var(--border-main);">v2.0</span>
-          </h1>
-          <p class="text-[11px] leading-none text-[var(--text-sub)]">Turn AI code into cute mobile apps ✨</p>
-        </div>
+  <header>
+    <div class="top-bar">
+      <div class="title">
+        <span>WebbyPop ✨</span>
+        <span class="pro-badge" id="header-pro-badge" style="display:none;">PRO</span>
       </div>
-
-      <!-- Quick Action Buttons -->
-      <div class="flex items-center space-x-2">
-        <button onclick="shareAsUrl()" class="flex items-center gap-1 px-3 py-1.5 active:scale-95 transition text-xs font-bold rounded-full shadow-2xs border border-[var(--border-accent)]" style="background-color: var(--bg-card); color: var(--c-accent1);" title="URL共有リンクを発行">
-          <i data-lucide="share" class="w-3.5 h-3.5"></i>
-          <span>共有URL</span>
-        </button>
-        <button id="theme-toggle-btn" onclick="toggleTheme()" class="w-8 h-8 rounded-xl border border-[var(--border-main)] bg-[var(--bg-card)] flex items-center justify-center text-[var(--c-accent1)] hover:opacity-80 active:scale-95 transition" title="モード切替">
-          <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
-        </button>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <!-- ✨ 文字をなくして記号（🌙 / ☀️）だけにしたすっきりアイコンボタン -->
+        <button class="header-btn icon-only-btn" onclick="toggleTheme()" id="btn-theme" title="テーマ切り替え">🌙</button>
+        <button class="header-btn" onclick="openProModal()" id="btn-pro-toggle">⚙️ ライセンス</button>
+        <button class="header-btn" onclick="toggleLanguage()" id="btn-lang">🌐 EN / 日本語</button>
       </div>
     </div>
-
-    <!-- Segmented Tab Switcher -->
-    <div class="max-w-xl mx-auto mt-2.5">
-      <div class="p-1 rounded-xl flex text-xs font-semibold shadow-inner border border-[var(--border-main)] transition-colors" style="background-color: var(--bg-card-sub); color: var(--text-sub);">
-        <button onclick="switchTab('editor')" id="tab-btn-editor" class="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-sm" style="background-color: var(--bg-card); color: var(--text-main);">
-          <i data-lucide="code-2" class="w-3.5 h-3.5" style="color: var(--c-accent2);"></i>
-          <span>コード</span>
-        </button>
-        <button onclick="switchTab('preview')" id="tab-btn-preview" class="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all" style="color: var(--text-sub);">
-          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
-          <span>プレビュー</span>
-        </button>
-        <button onclick="switchTab('templates')" id="tab-btn-templates" class="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all" style="color: var(--text-sub);">
-          <i data-lucide="layout-template" class="w-3.5 h-3.5"></i>
-          <span>骨組み見本</span>
-        </button>
-        <button onclick="switchTab('guide')" id="tab-btn-guide" class="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all" style="color: var(--text-sub);">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          <span>AI指示文</span>
-        </button>
-      </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-guide" onclick="showScreen('guide')">✨ AI指示文</button>
+      <button class="tab-btn" id="tab-editor" onclick="showScreen('editor')">💻 コード</button>
+      <button class="tab-btn" id="tab-preview" onclick="showScreen('preview')">📱 プレビュー</button>
     </div>
   </header>
 
-  <main class="flex-1 max-w-xl w-full mx-auto p-4 pb-20">
+  <main>
+    <!-- 画面1: AI指示文 -->
+    <section id="screen-guide">
+      <div class="card">
+        <label class="label" id="lbl-idea">1. どんなアプリを作りたい？</label>
+        <div class="template-bar" id="template-bar"></div>
+        <input type="text" id="user-idea" value="抹茶スイーツのお気に入りリストとお会計計算アプリ" oninput="buildPrompt()">
 
-    <!-- 1. EDITOR TAB SCREEN -->
-    <section id="screen-editor" class="space-y-3">
-      <div class="flex items-center justify-between text-xs text-[var(--text-sub)]">
-        <span class="font-medium flex items-center gap-1 text-[var(--text-main)]">
-          <i data-lucide="file-code" class="w-3.5 h-3.5" style="color: var(--c-accent1);"></i>
-          HTML / CSS / JS コード入力
-        </span>
-        <div class="flex items-center gap-2">
-          <button onclick="pasteFromClipboard()" class="px-2.5 py-1 theme-card border text-[var(--text-main)] rounded-lg hover:opacity-85 active:scale-95 transition flex items-center gap-1 shadow-2xs">
-            <i data-lucide="clipboard" class="w-3.5 h-3.5" style="color: var(--c-accent3);"></i>
-            貼り付け (自動整形)
-          </button>
-          <button onclick="clearEditor()" class="px-2.5 py-1 theme-card border rounded-lg hover:opacity-85 active:scale-95 transition flex items-center gap-1 shadow-2xs" style="color: #EC1278;">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            クリア
-          </button>
+        <!-- 36色パレット -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label class="label" id="lbl-palette" style="margin-bottom:0;">2. 🎨 3色パレットを選ぶ（全36種）</label>
         </div>
-      </div>
-
-      <!-- Code Textarea -->
-      <div class="relative rounded-2xl overflow-hidden shadow-lg border border-[var(--border-main)] transition-colors" style="background-color: var(--code-bg);">
-        <div class="px-3 py-1.5 flex items-center justify-between text-[11px] border-b border-white/10" style="background-color: rgba(0, 0, 0, 0.25);">
-          <div class="flex items-center space-x-1.5">
-            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: #EC1278;"></span>
-            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: #FB76FB;"></span>
-            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: #8587F8;"></span>
-            <span class="ml-2 font-mono text-[10px] text-white/70">index.html</span>
-          </div>
-          <span id="code-length-indicator" class="font-mono text-[10px] text-white/50">0文字</span>
-        </div>
-        <textarea id="code-input" spellcheck="false" class="w-full h-[62vh] bg-transparent text-white p-3.5 font-mono-code text-[12px] leading-relaxed resize-none focus:outline-none select-text overflow-y-auto" placeholder="ChatGPTやGeminiが出力したコードをそのままペーストしてください。```html などの余計な記号は自動で取り除かれます。"></textarea>
-      </div>
-    </section>
-
-    <!-- 2. PREVIEW TAB SCREEN -->
-    <section id="screen-preview" class="hidden space-y-3">
-      <!-- Preview controls bar -->
-      <div class="theme-card p-2.5 rounded-2xl border shadow-xs flex items-center justify-between">
-        <div class="flex items-center space-x-1.5">
-          <button onclick="renderPreview()" title="再読み込み" class="p-2 rounded-xl text-[var(--text-main)] hover:bg-[var(--bg-card-sub)] active:scale-95 transition">
-            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-          </button>
-          <button onclick="resetAppData()" title="アプリ内データを空にして再読込" class="px-2.5 py-1 theme-card-sub border border-[var(--border-main)] text-[var(--text-main)] rounded-xl text-xs font-medium flex items-center gap-1 active:scale-95 transition">
-            <i data-lucide="database-zap" class="w-3.5 h-3.5" style="color: var(--c-accent3);"></i>
-            <span>データ初期化</span>
-          </button>
-          <button onclick="togglePhoneFrame()" id="btn-toggle-frame" title="画面枠切替" class="px-2.5 py-1 theme-card-sub border border-[var(--border-main)] text-[var(--text-main)] rounded-xl text-xs font-medium flex items-center gap-1 active:scale-95 transition">
-            <i data-lucide="smartphone" class="w-3.5 h-3.5" style="color: var(--c-accent2);"></i>
-            <span id="frame-mode-text">スマホ枠</span>
-          </button>
+        <div class="palette-tabs">
+          <button class="palette-tab-btn active" id="ptab-nature" onclick="switchCategory('nature')">ニュアンス自然(9)</button>
+          <button class="palette-tab-btn" id="ptab-cloud" onclick="switchCategory('cloud')">パステル雲(9)</button>
+          <button class="palette-tab-btn" id="ptab-retro" onclick="switchCategory('retro')">レトロ喫茶(9)</button>
+          <button class="palette-tab-btn" id="ptab-flower" onclick="switchCategory('flower')">フェミニンフラワー(9)</button>
         </div>
 
-        <div class="flex items-center space-x-1.5">
-          <button onclick="openStandaloneTab()" class="px-3 py-1 text-xs font-bold rounded-xl flex items-center gap-1 active:scale-95 transition shadow-2xs border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">
-            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>全画面</span>
-          </button>
-        </div>
-      </div>
+        <div id="palette-list" class="palette-grid"></div>
 
-      <!-- Preview Device Area (画面遮断ノッチ撤廃版) -->
-      <div id="preview-wrapper" class="flex justify-center items-center py-2 transition-all">
-        <div id="device-container" class="w-full max-w-[390px] h-[640px] bg-black rounded-[42px] p-2.5 shadow-2xl relative border-[3.5px] transition-all duration-300" style="border-color: var(--device-border);">
-          <div class="w-full h-full bg-white rounded-[32px] overflow-hidden relative shadow-inner">
-            <iframe id="preview-iframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
-          </div>
-        </div>
-      </div>
-    </section>
+        <!-- 便利機能 -->
+        <label class="label" id="lbl-features">3. ⚡ 入れたい便利機能（タップで複数ON/OFF）</label>
+        <div class="group-title" id="grp-mobile">【📱 スマホ操作】</div>
+        <div class="chip-container" id="container-mobile"></div>
 
-    <!-- 3. TEMPLATES TAB SCREEN -->
-    <section id="screen-templates" class="hidden space-y-4">
-      <div class="p-4 rounded-3xl shadow-sm space-y-1 border" style="background: linear-gradient(135deg, var(--bg-card-sub), var(--bg-card)); border-color: var(--border-accent);">
-        <h2 class="text-base font-bold flex items-center gap-1.5" style="color: var(--c-accent1);">
-          <i data-lucide="layout-template" class="w-4 h-4" style="color: var(--c-accent2);"></i>
-          アプリの骨組み（汎用テンプレート）
-        </h2>
-        <p class="text-xs text-[var(--text-sub)]">スマホアプリの基本骨組みです。ここから改造していけます。</p>
-      </div>
+        <div class="group-title" id="grp-effects">【✨ 演出・計算・グラフ】</div>
+        <div class="chip-container" id="container-effects"></div>
 
-      <div class="space-y-3">
-        <!-- Template 1: Tab Navigation App Base -->
-        <div class="theme-card p-4 rounded-2xl border shadow-xs flex items-center justify-between">
-          <div class="space-y-1 pr-3">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">📱</span>
-              <h4 class="text-sm font-bold text-[var(--text-main)]">下部タブ式 モバイルアプリ基本枠</h4>
-            </div>
-            <p class="text-xs text-[var(--text-sub)]">ヘッダー・下部アイコンタブ・画面切り替えの定番UI。</p>
-          </div>
-          <button onclick="loadSampleAndGo('bottomnav')" class="px-3 py-2 rounded-xl text-xs font-bold shrink-0 active:scale-95 transition border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">
-            使う
-          </button>
+        <div class="group-title" id="grp-storage">【💾 データ管理・保護・予定】</div>
+        <div class="chip-container" id="container-storage"></div>
+
+        <!-- 自由記入エリア -->
+        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+          <label class="label" id="lbl-custom-note">✍️ 自由にこだわりをひとこと足す（任意・自由記入）</label>
+          <textarea id="custom-note" rows="3" placeholder="例：ボタンを大きめにしたい、推しの名前を最初から入れておいて、余白を広めにして、など自由に書いてね" oninput="buildPrompt()" style="margin-bottom: 6px; resize: vertical;"></textarea>
+          <div style="font-size: 10px; color: var(--text-muted);" id="txt-custom-hint">※ あなたの言葉がそのままAIへの最適な指示（箇条書き）に自動変換されます。</div>
         </div>
 
-        <!-- Template 2: Card & List with Form -->
-        <div class="theme-card p-4 rounded-2xl border shadow-xs flex items-center justify-between">
-          <div class="space-y-1 pr-3">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">📝</span>
-              <h4 class="text-sm font-bold text-[var(--text-main)]">追加＆削除つき カードリスト枠</h4>
-            </div>
-            <p class="text-xs text-[var(--text-sub)]">入力して「追加」するとカードが増える枠。メモやリストに。</p>
-          </div>
-          <button onclick="loadSampleAndGo('cardlist')" class="px-3 py-2 rounded-xl text-xs font-bold shrink-0 active:scale-95 transition border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">
-            使う
-          </button>
+        <!-- アプリ生成セクション -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; margin-bottom:6px;">
+          <label class="label" style="margin-bottom:0;" id="lbl-gen">4. 🪄 アプリを生成する</label>
+          <span id="gen-count-badge" style="font-size:10px; font-weight:600; color:var(--text-sub); background:var(--bg-sub); padding:2px 8px; border-radius:10px; border:1px solid var(--border-color);">
+            本日あと 3回
+          </span>
         </div>
 
-        <!-- Template 3: Bio Links Hub -->
-        <div class="theme-card p-4 rounded-2xl border shadow-xs flex items-center justify-between">
-          <div class="space-y-1 pr-3">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🎨</span>
-              <h4 class="text-sm font-bold text-[var(--text-main)]">プロフ＆リンク集 (Litlink風) 枠</h4>
-            </div>
-            <p class="text-xs text-[var(--text-sub)]">アバターやSNSリンクが並ぶポートフォリオ用基本枠。</p>
-          </div>
-          <button onclick="loadSampleAndGo('links')" class="px-3 py-2 rounded-xl text-xs font-bold shrink-0 active:scale-95 transition border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">
-            使う
-          </button>
-        </div>
+        <button class="action-btn magic-btn" id="btn-generate-ai" onclick="generateCodeWithAI()">✨ このアプリを自動生成する！</button>
+        
+        <button type="button" id="btn-sns-share" class="chip" style="width:100%; justify-content:center; padding:8px; margin-bottom:8px; border-color:var(--border-color); color:var(--text-sub); font-size:11px;" onclick="shareOnSNS()">
+          📢 シェアで本日の生成を +1回回復
+        </button>
 
-        <!-- Template 4: Generator / Lottery -->
-        <div class="theme-card p-4 rounded-2xl border shadow-xs flex items-center justify-between">
-          <div class="space-y-1 pr-3">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🎲</span>
-              <h4 class="text-sm font-bold text-[var(--text-main)]">ワンタップ抽選・診断ジェネレーター枠</h4>
-            </div>
-            <p class="text-xs text-[var(--text-sub)]">ボタンを押すと結果がランダムに切り替わる枠組み。</p>
-          </div>
-          <button onclick="loadSampleAndGo('generator')" class="px-3 py-2 rounded-xl text-xs font-bold shrink-0 active:scale-95 transition border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">
-            使う
-          </button>
-        </div>
-      </div>
-
-      <!-- Saved History Section -->
-      <div class="space-y-2 pt-2">
-        <div class="flex items-center justify-between px-1">
-          <h3 class="text-xs font-bold uppercase tracking-wider" style="color: var(--c-accent1);">保存済みプロジェクト</h3>
-          <button onclick="saveCurrentCodeAsProject()" class="text-xs font-bold flex items-center gap-1 transition" style="color: var(--c-accent2);">
-            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-            現在のコードを保存
-          </button>
-        </div>
-        <div id="saved-projects-list" class="space-y-2"></div>
-      </div>
-    </section>
-
-    <!-- 4. GUIDE & PROMPT TIPS SCREEN -->
-    <section id="screen-guide" class="hidden space-y-4">
-      <div class="theme-card p-5 rounded-3xl border shadow-xs space-y-4">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" style="background-color: var(--bg-card-sub); color: var(--c-accent1); border-color: var(--border-accent);">AI指示文ジェネレーター</span>
-          <h2 class="text-base font-bold mt-1 flex items-center gap-2 text-[var(--text-main)]">
-            <i data-lucide="wand-2" class="w-5 h-5" style="color: var(--c-accent2);"></i>
-            アプリの希望を書く＆選ぶだけ！
-          </h2>
-          <p class="text-xs text-[var(--text-sub)] mt-1 leading-relaxed">
-            作りたいアプリの内容に、デザインカラーや欲しい機能の指定を自動でドッキングした完成プロンプトを生成します。
-          </p>
-        </div>
-
-        <!-- 1: User's wish input -->
-        <div class="space-y-1.5">
-          <label class="text-xs font-bold flex items-center gap-1.5 text-[var(--text-main)]">
-            <span class="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center font-bold" style="background-color: var(--c-accent1);">1</span>
-            どんなアプリを作りたい？
-          </label>
-          <input id="user-idea-input" type="text" oninput="updateGeneratedPrompt()" placeholder="例: 抹茶スイーツのお気に入りリスト / 毎日の体重トラッカー" class="w-full text-xs p-3 rounded-xl border border-[var(--border-main)] focus:outline-none focus:border-[var(--c-accent2)] bg-[var(--bg-card-sub)] text-[var(--text-main)] transition" value="抹茶スイーツのお気に入りリストとお会計計算アプリ">
-        </div>
-
-        <!-- 2: Design Color Theme Chips -->
-        <div class="space-y-1.5">
-          <label class="text-xs font-bold text-[var(--text-main)]">🎨 配色テーマを選ぶ</label>
-          <div class="flex flex-wrap gap-1.5" id="color-chips">
-            <button onclick="setColorTheme('romantic', this)" class="chip-btn active">ロマンティック (#2E2979 & #F39DF4)</button>
-            <button onclick="setColorTheme('cyber', this)" class="chip-btn">サイバーネオン (#181824 & #FB76FB)</button>
-            <button onclick="setColorTheme('cafe', this)" class="chip-btn">淡色カフェ (#5A4A42 & #EADBC8)</button>
-            <button onclick="setColorTheme('minimal', this)" class="chip-btn">モノトーン (#111111 & #F3F4F6)</button>
-          </div>
-        </div>
-
-        <!-- 3: Desired Features Chips -->
-        <div class="space-y-1.5">
-          <label class="text-xs font-bold text-[var(--text-main)]">⚡ 入れたい機能を選ぶ（複数可）</label>
-          <div class="flex flex-wrap gap-1.5">
-            <button onclick="toggleFeature('storage', this)" class="chip-btn active">スマホ保存 (LocalStorage)</button>
-            <button onclick="toggleFeature('tabs', this)" class="chip-btn active">下部タブ切り替え</button>
-            <button onclick="toggleFeature('search', this)" class="chip-btn">検索・絞り込み機能</button>
-            <button onclick="toggleFeature('darkmode', this)" class="chip-btn">ダークモード切り替え</button>
-          </div>
-        </div>
-
-        <!-- 4: Auto generated prompt card -->
-        <div class="space-y-1.5 pt-2 border-t border-[var(--border-main)]">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold flex items-center gap-1.5 text-[var(--text-main)]">
-              <span class="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center font-bold" style="background-color: var(--c-accent1);">2</span>
-              完成したAI指示文（そのままコピーでOK）
-            </label>
-            <button onclick="copyGeneratedPrompt()" class="px-3 py-1 rounded-lg text-xs font-bold active:scale-95 flex items-center gap-1 shadow-sm transition" style="background-color: var(--c-accent2); color: var(--btn-primary-text);">
-              <i data-lucide="copy" class="w-3 h-3"></i>
-              コピーする
+        <button class="action-btn" id="btn-copy-prompt" onclick="copyPrompt()">📋 AI指示文をコピーする（手動用）</button>
+        
+        <!-- APIキー設定エリア -->
+        <div style="margin-top: 8px; padding: 12px; background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 14px; font-size: 11px;">
+          <div style="font-weight: bold; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span id="txt-apikey">🔑 Gemini APIキー（自動生成用）</span>
+            <button type="button" onclick="openApiHelp()" style="background: var(--bg-card); border: 1px solid var(--c3); color: var(--text-main); padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; cursor: pointer;">
+              ❓ 無料キーの取り方
             </button>
           </div>
-          <textarea id="generated-prompt-box" readonly rows="10" class="w-full text-xs font-mono bg-[var(--bg-card-sub)] border border-[var(--border-main)] p-3 rounded-2xl text-[var(--text-main)] whitespace-pre-wrap select-text leading-relaxed resize-none focus:outline-none"></textarea>
-          <p class="text-[11px] text-[var(--text-muted)]">※ これをコピーしてGeminiやChatGPTに送信し、返ってきたコードを「コード」タブに貼るだけで完成します！</p>
+          <input type="password" id="api-key-input" placeholder="AI Studioの無料APIキーを入力" style="margin-bottom: 4px; font-size: 11px; padding: 8px 10px;" onchange="saveApiKey()">
+          <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 10px;">
+            <span>※ 完全無料・端末内保存のみ</span>
+            <span id="api-status" style="font-weight: bold;">未設定</span>
+          </div>
         </div>
+
+        <textarea id="prompt-box" rows="6" readonly style="margin-top: 10px;"></textarea>
       </div>
 
-      <!-- Export / Share Utilities -->
-      <div class="theme-card p-4 rounded-3xl border shadow-xs space-y-3">
-        <h3 class="text-sm font-bold flex items-center gap-2 text-[var(--text-main)]">
-          <i data-lucide="share-2" class="w-4 h-4" style="color: var(--c-accent2);"></i>
-          保存と共有
-        </h3>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <button onclick="downloadHtmlFile()" class="p-3 theme-card-sub rounded-2xl border border-[var(--border-main)] font-semibold text-[var(--text-main)] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition">
-            <i data-lucide="download" class="w-4 h-4" style="color: var(--c-accent1);"></i>
-            <span>HTML保存</span>
-          </button>
-          <button onclick="copyCurrentCode()" class="p-3 theme-card-sub rounded-2xl border border-[var(--border-main)] font-semibold text-[var(--text-main)] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition">
-            <i data-lucide="copy" class="w-4 h-4" style="color: var(--c-accent2);"></i>
-            <span>コード全コピー</span>
-          </button>
+      <!-- 保存と共有 -->
+      <div class="card" style="padding: 16px;">
+        <label class="label" id="lbl-save-share">💾 保存と共有</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button type="button" class="chip" style="justify-content: center; padding: 10px;" onclick="downloadHtmlFile()" id="btn-dl-html">📥 HTML保存</button>
+          <button type="button" class="chip" style="justify-content: center; padding: 10px;" onclick="saveCurrentProject()" id="btn-save-proj">📁 端末に保存</button>
         </div>
+        <button type="button" class="action-btn" style="margin-top: 8px; background: var(--c1); color: #FFFFFF;" onclick="shareDirectUrl()">🔗 共有リンクを発行する</button>
+        <div id="saved-projects-list" style="margin-top: 12px;"></div>
       </div>
     </section>
 
+    <!-- 画面2: コード貼り付け -->
+    <section id="screen-editor" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label class="label" style="margin-bottom: 0;" id="lbl-editor">HTMLコード</label>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="chip" style="padding: 4px 10px; font-size: 11px;" onclick="copyFullCode()">📑 全体コピー</button>
+            <button type="button" class="chip" style="padding: 4px 10px; font-size: 11px;" onclick="pasteToEditor()">📋 貼り付け</button>
+            <button type="button" class="chip" style="padding: 4px 10px; font-size: 11px; color: var(--c3);" onclick="clearEditor()">🗑️ 全消し</button>
+          </div>
+        </div>
+        <textarea id="app-code" rows="13" placeholder="ここにコードが入ります"></textarea>
+        <button class="action-btn" id="btn-run" onclick="previewApp()">プレビューで動かす！</button>
+      </div>
+    </section>
+
+    <!-- 画面3: プレビュー画面 -->
+    <section id="screen-preview" style="display: none;">
+      <div class="card">
+        <div class="preview-controls">
+          <div style="display: flex; gap: 6px;">
+            <button class="chip" onclick="renderPreview()" id="btn-reload">🔄 再読み込み</button>
+            <button class="chip" id="btn-toggle-frame" onclick="togglePhoneFrame()">📱 スマホ枠</button>
+          </div>
+          <button class="chip" style="background: var(--c1); color: #FFFFFF; border-color: var(--c1);" onclick="openFullscreen()" id="btn-fullscreen">↗ 全画面表示</button>
+        </div>
+
+        <div class="preview-frame-container">
+          <div id="device-mockup" class="phone-mockup">
+            <iframe id="preview-frame" class="phone-screen" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Save Project Modal -->
-  <div id="save-project-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="theme-card w-full max-w-sm rounded-3xl p-5 shadow-2xl border space-y-4">
-      <div class="space-y-1">
-        <h3 class="text-sm font-bold flex items-center gap-1.5 text-[var(--text-main)]">
-          <i data-lucide="folder-plus" class="w-4 h-4" style="color: var(--c-accent2);"></i>
-          プロジェクトを保存
-        </h3>
-        <p class="text-xs text-[var(--text-sub)]">現在のコードに名前をつけて端末に保存します。</p>
+  <!-- APIキーの取り方ガイド -->
+  <div id="api-help-modal" onclick="closeApiHelp(event)">
+    <div class="help-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 15px; font-weight: bold; color: var(--text-main);">🔑 APIキーの取り方（完全無料）</h3>
+        <button type="button" onclick="closeApiHelp()" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted);">✕</button>
       </div>
-      <input id="save-project-name" type="text" placeholder="例: 私のカフェアプリ" class="w-full text-xs p-2.5 rounded-xl border border-[var(--border-main)] focus:outline-none focus:border-[var(--c-accent2)] bg-[var(--bg-card-sub)] text-[var(--text-main)]">
-      <div class="flex items-center justify-end space-x-2 pt-1">
-        <button onclick="closeSaveModal()" class="px-3.5 py-1.5 text-xs text-[var(--text-sub)] rounded-xl transition">キャンセル</button>
-        <button onclick="confirmSaveProject()" class="px-4 py-1.5 text-xs font-bold rounded-xl shadow-xs transition" style="background-color: var(--c-accent2); color: var(--btn-primary-text);">保存する</button>
+      <p style="font-size: 11px; color: var(--text-sub); margin: 0 0 12px; line-height: 1.5;">
+        Googleアカウントさえあれば誰でも数秒で発行できます。サーバー代や登録費用は完全無料です。
+      </p>
+      <div class="step-box">
+        <span class="step-badge">ステップ 1</span>
+        <div><b>Google AI Studio を開く</b></div>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="display: inline-block; margin-top: 6px; background: var(--c1); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold;">
+          ↗ Google AI Studioを開く
+        </a>
       </div>
+      <div class="step-box">
+        <span class="step-badge">ステップ 2</span>
+        <div><b>「Create API key」を押す</b></div>
+        <div style="margin-top: 4px; color: var(--text-sub);">青いボタンを押すと専用キーが生成されます。</div>
+      </div>
+      <div class="step-box">
+        <span class="step-badge">ステップ 3</span>
+        <div><b>キーをコピーして貼り付ける</b></div>
+        <div style="margin-top: 4px; color: var(--text-sub);">表示されたキーをコピーして枠に入力すれば完了です！</div>
+      </div>
+      <button type="button" class="action-btn" style="margin-top: 8px; margin-bottom: 0;" onclick="closeApiHelp()">閉じる</button>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 text-xs font-medium px-4 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 backdrop-blur-md border border-[var(--border-accent)]" style="background-color: var(--bg-card); color: var(--text-main);">
-    <i data-lucide="sparkles" class="w-3.5 h-3.5" style="color: var(--c-accent2);"></i>
-    <span id="toast-text">メッセージ</span>
-  </div>
+  <div id="toast">メッセージ</div>
 
   <script>
-    // --- 1. テーマ設定 ---
-    let isDarkMode = false;
-    function applyTheme(dark) {
-      isDarkMode = dark;
-      const body = document.body;
-      const themeIcon = document.getElementById('theme-icon');
-      if (dark) {
-        body.classList.add('dark-mode');
-        if (themeIcon) themeIcon.setAttribute('data-lucide', 'sun');
-      } else {
-        body.classList.remove('dark-mode');
-        if (themeIcon) themeIcon.setAttribute('data-lucide', 'moon');
+    // --- 🌙 / ☀️ テーマ管理（記号のみでスマートに切り替え） ---
+    let currentTheme = localStorage.getItem('webbypop_theme') || 'light';
+
+    function initTheme() {
+      if (!localStorage.getItem('webbypop_theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        currentTheme = 'dark';
       }
-      try { localStorage.setItem('webbypop_theme', dark ? 'dark' : 'light'); } catch(e){}
-      if (window.lucide) lucide.createIcons();
-      updateTabStyles();
+      applyTheme();
     }
 
     function toggleTheme() {
-      applyTheme(!isDarkMode);
-      showToast(isDarkMode ? '🌙 ダークモードに切り替えました' : '☀️ ライトモードに切り替えました');
+      currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+      localStorage.setItem('webbypop_theme', currentTheme);
+      applyTheme();
+      showToast(currentTheme === 'dark' ? '🌙 ダークモード' : '☀️ ライトモード');
     }
 
-    // --- 2. タブ制御 ---
-    let currentTab = 'editor';
-    let isPhoneFrame = true;
-
-    function switchTab(tabId) {
-      currentTab = tabId;
-      ['editor', 'preview', 'templates', 'guide'].forEach(t => {
-        const screen = document.getElementById(`screen-${t}`);
-        if (screen) {
-          if (t === tabId) screen.classList.remove('hidden');
-          else screen.classList.add('hidden');
-        }
-      });
-      updateTabStyles();
-      if (tabId === 'preview') renderPreview();
-    }
-
-    function updateTabStyles() {
-      ['editor', 'preview', 'templates', 'guide'].forEach(t => {
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (!btn) return;
-        if (t === currentTab) {
-          btn.style.backgroundColor = 'var(--bg-card)';
-          btn.style.color = 'var(--text-main)';
-          btn.classList.add('shadow-sm');
-        } else {
-          btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text-sub)';
-          btn.classList.remove('shadow-sm');
-        }
-      });
-    }
-
-    // --- 3. AIコード貼り付け & クリーニング ---
-    const codeInput = document.getElementById('code-input');
-    const lengthIndicator = document.getElementById('code-length-indicator');
-
-    function cleanAICode(raw) {
-      let text = raw.trim();
-      // Markdownコードブロック除去 (```html や ``` を消去)
-      text = text.replace(/^```[a-zA-Z]*\n?/gm, '').replace(/```$/gm, '').trim();
-      // 前後の不要なAIの挨拶文を削除し、<!DOCTYPE html>または<htmlから</html>までを抽出
-      const htmlStart = text.search(/<!DOCTYPE html|<html/i);
-      const htmlEnd = text.search(/<\/html>/i);
-      if (htmlStart !== -1 && htmlEnd !== -1) {
-        text = text.substring(htmlStart, htmlEnd + 7);
+    function applyTheme() {
+      const btn = document.getElementById('btn-theme');
+      if (currentTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        // ダークモードの時は「太陽（ライトにする）」マークを表示
+        if (btn) btn.innerText = '☀️';
+      } else {
+        document.body.classList.remove('dark-mode');
+        // ライトモードの時は「月（ダークにする）」マークを表示
+        if (btn) btn.innerText = '🌙';
       }
-      return text;
     }
 
-    if (codeInput && lengthIndicator) {
-      codeInput.addEventListener('input', () => {
-        lengthIndicator.innerText = `${codeInput.value.length}文字`;
-        try { localStorage.setItem('ai_code_cache', codeInput.value); } catch(e){}
+    // --- 🔐 端末専用ID ＆ 秘密マスターキー ---
+    let deviceId = localStorage.getItem('webbypop_device_id');
+    if (!deviceId) {
+      const randNum = Math.floor(1000 + Math.random() * 9000);
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const randChar = chars[Math.floor(Math.random() * chars.length)];
+      deviceId = `WP-${randNum}-${randChar}`;
+      localStorage.setItem('webbypop_device_id', deviceId);
+    }
+
+    const idDigits = parseInt(deviceId.split('-')[1], 10);
+    const idChar = deviceId.split('-')[2];
+    const correctPasscode = `PASS-${idDigits * 2}-${idChar}`;
+    const DEVELOPER_MASTER_KEY = 'eri2026vip';
+
+    let isProUser = localStorage.getItem('webbypop_is_pro') === 'true';
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    let lastDate = localStorage.getItem('webbypop_gen_date');
+
+    if (lastDate !== todayStr) {
+      localStorage.setItem('webbypop_gen_date', todayStr);
+      localStorage.setItem('webbypop_gen_count', '3');
+    }
+
+    let rawCount = parseInt(localStorage.getItem('webbypop_gen_count') ?? '3', 10);
+    if (rawCount > 4) {
+      rawCount = 4;
+      localStorage.setItem('webbypop_gen_count', '4');
+    }
+    let genCount = rawCount;
+
+    function updateGenCountUI() {
+      const badge = document.getElementById('gen-count-badge');
+      const shareBtn = document.getElementById('btn-sns-share');
+
+      if (isProUser) {
+        badge.innerText = (currentLang === 'ja') ? '無制限（Pro）' : 'Unlimited (Pro)';
+        badge.style.borderColor = 'var(--c1)';
+        badge.style.color = 'var(--c1)';
+        if (shareBtn) shareBtn.style.display = 'none';
+      } else {
+        badge.innerText = (currentLang === 'ja') ? `本日あと ${genCount}回` : `${genCount} left today`;
+        badge.style.borderColor = 'var(--border-color)';
+        badge.style.color = genCount > 0 ? 'var(--text-sub)' : 'var(--c3)';
+
+        if (shareBtn) {
+          shareBtn.style.display = 'flex';
+          const alreadySharedToday = (localStorage.getItem('webbypop_last_share_date') === todayStr);
+          if (alreadySharedToday) {
+            shareBtn.innerText = (currentLang === 'ja') ? '✓ 本日の回復完了（明日また増えます）' : '✓ Shared today (Refills tomorrow)';
+            shareBtn.style.opacity = '0.5';
+            shareBtn.style.cursor = 'default';
+          } else {
+            shareBtn.innerText = (currentLang === 'ja') ? '📢 シェアで本日の生成を +1回回復' : '📢 Share on X to get +1 Gen';
+            shareBtn.style.opacity = '1';
+            shareBtn.style.cursor = 'pointer';
+          }
+        }
+      }
+    }
+
+    function shareOnSNS() {
+      if (localStorage.getItem('webbypop_last_share_date') === todayStr) {
+        showToast(currentLang === 'ja' ? '本日の回復は完了しています' : 'Already refilled today');
+        return;
+      }
+
+      const tweetText = encodeURIComponent(`WebbyPopで可愛いスマホWebアプリ作ってるよ✨ AIコードをスマホで簡単プレビュー！ #WebbyPop`);
+      const url = `https://twitter.com/intent/tweet?text=${tweetText}`;
+      window.open(url, '_blank');
+      
+      genCount += 1;
+      localStorage.setItem('webbypop_gen_count', genCount.toString());
+      localStorage.setItem('webbypop_last_share_date', todayStr);
+      updateGenCountUI();
+      showToast(currentLang === 'ja' ? '✨ 回数 +1回 回復しました！' : '✨ +1 Gen added!');
+    }
+
+    function openProModal() {
+      if (isProUser) {
+        if (confirm(currentLang === 'ja' ? 'Proライセンスを解除して無料版に戻しますか？' : 'Deactivate Pro license?')) {
+          isProUser = false;
+          localStorage.setItem('webbypop_is_pro', 'false');
+          updateProUI();
+          showToast(currentLang === 'ja' ? '無料版に戻しました' : 'Switched to Free mode');
+        }
+      } else {
+        const msg = (currentLang === 'ja')
+          ? `【ライセンス認証】\n\nあなたの端末ID:\n👉 ${deviceId}\n\nお持ちのライセンスキーを入力してください:`
+          : `【License Activation】\n\nDevice ID:\n👉 ${deviceId}\n\nEnter your license key:`;
+        const pass = prompt(msg);
+        
+        if (pass === DEVELOPER_MASTER_KEY || pass === correctPasscode) {
+          isProUser = true;
+          localStorage.setItem('webbypop_is_pro', 'true');
+          updateProUI();
+          showToast(currentLang === 'ja' ? '✨ Proライセンス有効化' : '✨ Pro activated');
+        } else if (pass) {
+          alert(currentLang === 'ja' ? 'キーが一致しませんでした。' : 'Invalid key.');
+        }
+      }
+    }
+
+    function updateProUI() {
+      const badge = document.getElementById('header-pro-badge');
+      const toggleBtn = document.getElementById('btn-pro-toggle');
+      if (isProUser) {
+        badge.style.display = 'inline-block';
+        toggleBtn.innerText = (currentLang === 'ja') ? '⚙️ Pro有効' : '⚙️ Pro Active';
+      } else {
+        badge.style.display = 'none';
+        toggleBtn.innerText = (currentLang === 'ja') ? '⚙️ ライセンス' : '⚙️ License';
+      }
+      updateGenCountUI();
+      renderPalettes();
+    }
+
+    let currentLang = 'ja';
+    const I18N = {
+      ja: {
+        tabGuide: '✨ AI指示文',
+        tabEditor: '💻 コード',
+        tabPreview: '📱 プレビュー',
+        lblIdea: '1. どんなアプリを作りたい？',
+        lblPalette: '2. 🎨 3色パレットを選ぶ（全36種）',
+        lblFeatures: '3. ⚡ 入れたい便利機能（タップで複数ON/OFF）',
+        lblCustomNote: '✍️ 自由にこだわりをひとこと足す（任意・自由記入）',
+        txtCustomHint: '※ あなたの言葉がそのままAIへの最適な指示（箇条書き）に自動変換されます。',
+        placeholderCustom: '例：ボタンを大きめにしたい、推しの名前を最初から入れておいて、余白を広めにして、など自由に書いてね',
+        lblGen: '4. 🪄 アプリを生成する',
+        btnGen: '✨ このアプリを自動生成する！',
+        btnCopy: '📋 AI指示文をコピーする（手動用）',
+        lblSaveShare: '💾 保存と共有',
+        lblEditor: 'HTMLコード',
+        btnRun: 'プレビューで動かす！',
+        btnReload: '🔄 再読み込み',
+        btnFrame: '📱 スマホ枠',
+        btnFullscreen: '↗ 全画面表示',
+        btnDlHtml: '📥 HTML保存',
+        btnSaveProj: '📁 端末に保存',
+        catNature: 'ニュアンス自然(9)',
+        catCloud: 'パステル雲(9)',
+        catRetro: 'レトロ喫茶(9)',
+        catFlower: 'フェミニンフラワー(9)',
+        grpMobile: '【📱 スマホ操作】',
+        grpEffects: '【✨ 演出・計算・グラフ】',
+        grpStorage: '【💾 データ管理・保護・予定】',
+        txtApiKey: '🔑 Gemini APIキー（自動生成用）'
+      },
+      en: {
+        tabGuide: '✨ Prompt',
+        tabEditor: '💻 Code',
+        tabPreview: '📱 Preview',
+        lblIdea: '1. What app do you want to build?',
+        lblPalette: '2. 🎨 Pick a 3-Color Palette (36 styles)',
+        lblFeatures: '3. ⚡ Choose Features (Tap to toggle)',
+        lblCustomNote: '✍️ Add custom details in your own words (Optional)',
+        txtCustomHint: '※ Your words will be automatically formatted into clear AI prompt guidelines.',
+        placeholderCustom: 'e.g., make buttons larger, pre-fill sample items, keep layout spacious, etc.',
+        lblGen: '4. 🪄 Generate App',
+        btnGen: '✨ Auto-Generate This App!',
+        btnCopy: '📋 Copy AI Prompt (Manual)',
+        lblSaveShare: '💾 Save & Export',
+        lblEditor: 'HTML Code',
+        btnRun: 'Run in Preview!',
+        btnReload: '🔄 Reload',
+        btnFrame: '📱 Mobile Frame',
+        btnFullscreen: '↗ Fullscreen',
+        btnDlHtml: '📥 Download HTML',
+        btnSaveProj: '📁 Save to Device',
+        catNature: 'Nuance Nature (9)',
+        catCloud: 'Pastel Cloud (9)',
+        catRetro: 'Retro Cafe (9)',
+        catFlower: 'Feminine Flower (9)',
+        grpMobile: '【📱 Mobile Control】',
+        grpEffects: '【✨ Effects, Calc & Charts】',
+        grpStorage: '【💾 Data, Security & Calendar】',
+        txtApiKey: '🔑 Gemini API Key (For Auto-Gen)'
+      }
+    };
+
+    const TEMPLATES = [
+      { id: 'cafe', btnJa: '☕ カフェ記録＆計算', btnEn: '☕ Cafe & Calc', ideaJa: '訪れたカフェの記録、写真、スイーツ代のお会計を自動集計できるメモアプリ', ideaEn: 'A cute cafe log app to save visited cafes, dessert photos, and auto-calculate total spending', cat: 'nature', paletteIdx: 0, features: ['tabs', 'storage', 'search', 'pasteimg', 'calc', 'toast'] },
+      { id: 'fan', btnJa: '⭐ 推し活出費＆予定', btnEn: '⭐ Fan Budget & Events', ideaJa: '推しのグッズ代や遠征費を記録して合計計算し、カレンダーでイベント予定も確認できるアプリ', ideaEn: 'An expense tracker to log idol merchandise and check concert event dates on a calendar', cat: 'retro', paletteIdx: 3, features: ['tabs', 'storage', 'chart', 'calc', 'calendar', 'toast', 'export'] },
+      { id: 'todo', btnJa: '🎙️ 音声やることリスト', btnEn: '🎙️ Voice Todo List', ideaJa: '声でサッと喋るだけでタスク追加でき、左スワイプで完了できるタスク管理アプリ', ideaEn: 'A minimalist daily todo app with voice-input task addition and swipe-to-complete', cat: 'cloud', paletteIdx: 0, features: ['tabs', 'storage', 'voice', 'swipe', 'vibrate', 'toast'] },
+      { id: 'habit', btnJa: '🌿 習慣カレンダー', btnEn: '🌿 Habit Calendar', ideaJa: '毎日の読書やストレッチをチェックし、カレンダー上で継続状況を可愛く振り返る習慣化アプリ', ideaEn: 'A daily habit tracker to check off streaks and visualize your progress on a monthly calendar', cat: 'flower', paletteIdx: 0, features: ['tabs', 'storage', 'calendar', 'toast', 'darkmode'] }
+    ];
+
+    function renderTemplates() {
+      const container = document.getElementById('template-bar');
+      if (!container) return;
+      container.innerHTML = '';
+      TEMPLATES.forEach(tpl => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'template-btn';
+        btn.innerText = (currentLang === 'ja') ? tpl.btnJa : tpl.btnEn;
+        btn.onclick = function() { applyTemplate(tpl); };
+        container.appendChild(btn);
       });
     }
 
-    function clearEditor() {
-      if (!codeInput || !codeInput.value) return;
-      codeInput.value = '';
-      if (lengthIndicator) lengthIndicator.innerText = '0文字';
-      try { localStorage.removeItem('ai_code_cache'); } catch(e){}
-      showToast('コードを消去しました');
+    function applyTemplate(tpl) {
+      document.getElementById('user-idea').value = (currentLang === 'ja') ? tpl.ideaJa : tpl.ideaEn;
+      selectedFeatures = [...tpl.features];
+      switchCategory(tpl.cat);
+      selectedPalette = ALL_PALETTES[tpl.cat][tpl.paletteIdx];
+      renderPalettes();
+      renderFeatureChips();
+      buildPrompt();
+      showToast((currentLang === 'ja') ? `「${tpl.btnJa}」を適用` : `Applied: ${tpl.btnEn}`);
     }
 
-    async function pasteFromClipboard() {
+    const ALL_FEATURES = [
+      { id: 'tabs', group: 'mobile', ja: '📑 下部タブ切り替え', en: '📑 Bottom Nav Bar' },
+      { id: 'voice', group: 'mobile', ja: '🎙️ ワンタップ音声入力', en: '🎙️ Voice Input (Mic)' },
+      { id: 'pullrefresh', group: 'mobile', ja: '🔄 引っ張って更新', en: '🔄 Pull-to-Refresh' },
+      { id: 'swipe', group: 'mobile', ja: '👈 左スワイプ削除', en: '👈 Swipe to Delete' },
+      { id: 'vibrate', group: 'mobile', ja: '📳 タップ時バイブ振動', en: '📳 Haptic Vibration' },
+      { id: 'pasteimg', group: 'mobile', ja: '📋 画像の直接ペースト保存', en: '📋 Direct Image Paste' },
+      { id: 'calc', group: 'effects', ja: '🧮 合計・平均の自動計算バー', en: '🧮 Auto Calculation Bar' },
+      { id: 'chart', group: 'effects', ja: '📊 自動グラフ表示', en: '📊 Visual Chart.js' },
+      { id: 'toast', group: 'effects', ja: '💬 通知トースト表示', en: '💬 Toast Notifications' },
+      { id: 'calendar', group: 'storage', ja: '📅 月間カレンダー表示', en: '📅 Monthly Calendar' },
+      { id: 'storage', group: 'storage', ja: '💾 スマホ内自動保存', en: '💾 Auto LocalStorage' },
+      { id: 'search', group: 'storage', ja: '🔍 リアルタイム検索', en: '🔍 Realtime Search' },
+      { id: 'passcode', group: 'storage', ja: '🔒 4桁パスコードロック', en: '🔒 4-Digit Passcode' },
+      { id: 'export', group: 'storage', ja: '📤 CSV/JSON書き出し保存', en: '📤 Export CSV/JSON' },
+      { id: 'darkmode', group: 'storage', ja: '🌗 ダークモード切り替え', en: '🌗 Dark Mode Toggle' }
+    ];
+
+    let selectedFeatures = ['tabs', 'calc', 'toast', 'storage'];
+
+    function toggleLanguage() {
+      currentLang = (currentLang === 'ja') ? 'en' : 'ja';
+      applyLanguage();
+      renderTemplates();
+      renderPalettes();
+      renderFeatureChips();
+      buildPrompt();
+      applyTheme();
+      showToast(currentLang === 'ja' ? '🇯🇵 日本語に切替' : '🇺🇸 Switched to EN');
+    }
+
+    function applyLanguage() {
+      const t = I18N[currentLang];
+      document.getElementById('tab-guide').innerText = t.tabGuide;
+      document.getElementById('tab-editor').innerText = t.tabEditor;
+      document.getElementById('tab-preview').innerText = t.tabPreview;
+      document.getElementById('lbl-idea').innerText = t.lblIdea;
+      document.getElementById('lbl-palette').innerText = t.lblPalette;
+      document.getElementById('lbl-features').innerText = t.lblFeatures;
+      document.getElementById('lbl-custom-note').innerText = t.lblCustomNote;
+      document.getElementById('txt-custom-hint').innerText = t.txtCustomHint;
+      document.getElementById('custom-note').placeholder = t.placeholderCustom;
+      document.getElementById('lbl-gen').innerText = t.lblGen;
+      document.getElementById('btn-generate-ai').innerText = t.btnGen;
+      document.getElementById('btn-copy-prompt').innerText = t.btnCopy;
+      document.getElementById('lbl-save-share').innerText = t.lblSaveShare;
+      document.getElementById('lbl-editor').innerText = t.lblEditor;
+      document.getElementById('btn-run').innerText = t.btnRun;
+      document.getElementById('btn-reload').innerText = t.btnReload;
+      document.getElementById('btn-fullscreen').innerText = t.btnFullscreen;
+      document.getElementById('btn-dl-html').innerText = t.btnDlHtml;
+      document.getElementById('btn-save-proj').innerText = t.btnSaveProj;
+      document.getElementById('grp-mobile').innerText = t.grpMobile;
+      document.getElementById('grp-effects').innerText = t.grpEffects;
+      document.getElementById('grp-storage').innerText = t.grpStorage;
+      document.getElementById('txt-apikey').innerText = t.txtApiKey;
+      document.getElementById('btn-lang').innerText = currentLang === 'ja' ? '🌐 EN / 日本語' : '🌐 JP / English';
+
+      document.getElementById('ptab-nature').innerText = t.catNature;
+      document.getElementById('ptab-cloud').innerText = t.catCloud;
+      document.getElementById('ptab-retro').innerText = t.catRetro;
+      document.getElementById('ptab-flower').innerText = t.catFlower;
+      updateProUI();
+    }
+
+    function renderFeatureChips() {
+      ['mobile', 'effects', 'storage'].forEach(groupKey => {
+        const container = document.getElementById('container-' + groupKey);
+        if (!container) return;
+        container.innerHTML = '';
+        const list = ALL_FEATURES.filter(f => f.group === groupKey);
+        list.forEach(feat => {
+          const chip = document.createElement('div');
+          const isSelected = selectedFeatures.includes(feat.id);
+          chip.className = 'chip' + (isSelected ? ' active' : '');
+          chip.innerText = (currentLang === 'ja') ? feat.ja : feat.en;
+          chip.onclick = function() {
+            if (selectedFeatures.includes(feat.id)) {
+              selectedFeatures = selectedFeatures.filter(k => k !== feat.id);
+            } else {
+              selectedFeatures.push(feat.id);
+            }
+            renderFeatureChips();
+            buildPrompt();
+          };
+          container.appendChild(chip);
+        });
+      });
+    }
+
+    function showScreen(screenId) {
+      document.getElementById('screen-guide').style.display = (screenId === 'guide') ? 'block' : 'none';
+      document.getElementById('screen-editor').style.display = (screenId === 'editor') ? 'block' : 'none';
+      document.getElementById('screen-preview').style.display = (screenId === 'preview') ? 'block' : 'none';
+
+      document.getElementById('tab-guide').className = 'tab-btn' + (screenId === 'guide' ? ' active' : '');
+      document.getElementById('tab-editor').className = 'tab-btn' + (screenId === 'editor' ? ' active' : '');
+      document.getElementById('tab-preview').className = 'tab-btn' + (screenId === 'preview' ? ' active' : '');
+
+      if (screenId === 'preview') renderPreview();
+    }
+
+    const ALL_PALETTES = {
+      nature: [
+        { name: "ピスタチオオレンジ", en: "Pistachio Sunset", colors: ["#B8DBC0", "#F7651A", "#F3F1EC"], isPro: false },
+        { name: "スモーキーバード", en: "Smoky Bluebird", colors: ["#B09B88", "#8FA9B6", "#F4F2EE"], isPro: false },
+        { name: "アジサイミスト", en: "Hydrangea Sky", colors: ["#8F79C4", "#84CFD5", "#F5F3EF"], isPro: false },
+        { name: "ピーチテラコッタ", en: "Peach Terracotta", colors: ["#E78F7A", "#F3F1EC", "#F7D6CB"], isPro: false },
+        { name: "フォレストグラス", en: "Forest Marigold", colors: ["#F4F2EE", "#FBBD22", "#075133"], isPro: true },
+        { name: "クラシックベリー", en: "Classic Blueberry", colors: ["#245EB5", "#F4F2EE", "#DE526A"], isPro: true },
+        { name: "ハニーミモザ", en: "Honey Mimosa", colors: ["#F3F1EC", "#FFF5DC", "#F5AB31"], isPro: true },
+        { name: "スプラウトリーフ", en: "Sprout Meadow", colors: ["#63E67D", "#CEE077", "#F4F2EE"], isPro: true },
+        { name: "オーキッドリボン", en: "Orchid Silver", colors: ["#F3F1EC", "#F7BED6", "#DFE4F2"], isPro: true }
+      ],
+      cloud: [
+        { name: "朝焼けクリーム", en: "Sunrise Sorbet", colors: ["#EAF4FF", "#D2E9FF", "#FFE2D8"], isPro: false },
+        { name: "ミントピーチ", en: "Mint Peach Cream", colors: ["#EBF8EA", "#FFE3D8", "#EAF4FF"], isPro: false },
+        { name: "コットンキャンディ", en: "Cotton Cloud", colors: ["#F7D2E5", "#C2E2FF", "#EAF4FF"], isPro: false },
+        { name: "ラベンダーマカロン", en: "Lavender Mint", colors: ["#DCF5EB", "#E5DCFF", "#FBDFEF"], isPro: false },
+        { name: "アイシングソーダ", en: "Icing Butter", colors: ["#DAE4F7", "#FFF3DC", "#EAF4FF"], isPro: true },
+        { name: "ライラックブーケ", en: "Lilac Foliage", colors: ["#E8EEFF", "#FFDFE9", "#EBF8EA"], isPro: true },
+        { name: "アプリコットティー", en: "Apricot Lavender", colors: ["#FFF4CC", "#E3D7FC", "#FFE6DC"], isPro: true },
+        { name: "バニラスノー", en: "Vanilla Sky", colors: ["#EAE3FF", "#FFF1DE", "#D9ECF9"], isPro: true },
+        { name: "ストロベリーホイップ", en: "Strawberry Frost", colors: ["#F7D2E5", "#ECF5FF", "#FFE3EE"], isPro: true }
+      ],
+      retro: [
+        { name: "夕暮れレコード", en: "Sunset Vinyl", colors: ["#D8672D", "#F8AAA0", "#FFEFCA"], isPro: false },
+        { name: "クリームソーダ", en: "Cream Soda Float", colors: ["#E03D34", "#EFE5C5", "#32C0BB"], isPro: false },
+        { name: "アンティークオリーブ", en: "Antique Olive", colors: ["#849968", "#E1B654", "#927967"], isPro: false },
+        { name: "メロンソーダ", en: "Melon Tangerine", colors: ["#149E95", "#FEAE42", "#F66E29"], isPro: false },
+        { name: "ルージュベルベット", en: "Rouge Velvet", colors: ["#D6C38B", "#FB9FBA", "#801B44"], isPro: true },
+        { name: "シネママスタード", en: "Cinema Midnight", colors: ["#F9F580", "#EE550E", "#121272"], isPro: true },
+        { name: "レトロフォレスト", en: "Retro Forest", colors: ["#236942", "#F67709", "#A17763"], isPro: true },
+        { name: "ネオンブルーベリー", en: "Neon Berry Soda", colors: ["#6FC8E8", "#AB4B77", "#2424A0"], isPro: true },
+        { name: "ポップトイボックス", en: "Pop Toy Scarlet", colors: ["#DE4844", "#569CB5", "#F8B454"], isPro: true }
+      ],
+      flower: [
+        { name: "ローズショコラ", en: "Rose Chocolate", colors: ["#C25394", "#B07BAC", "#E5E8E1"], isPro: false },
+        { name: "フランボワーズ", en: "Framboise Peacock", colors: ["#E599A2", "#A3C6DC", "#6C9394"], isPro: false },
+        { name: "ブロッサムラテ", en: "Blossom Pistachio", colors: ["#EFC1C1", "#F4EACE", "#B7DCE5"], isPro: false },
+        { name: "ダスティリボン", en: "Dusty Peony", colors: ["#A3B4DA", "#E8E8DD", "#DE7A86"], isPro: false },
+        { name: "モーブフラワー", en: "Mauve Petal Sand", colors: ["#BFA0C6", "#E1A7B7", "#E4C6B4"], isPro: true },
+        { name: "ピスタチオローズ", en: "Pistachio Rose", colors: ["#EAEBC9", "#B5C3CC", "#E28E95"], isPro: true },
+        { name: "チェリーボンボン", en: "Cherry Marine", colors: ["#0562AD", "#D74E90", "#EFBA89"], isPro: true },
+        { name: "ベリージェラート", en: "Berry Lavender", colors: ["#E1E8EB", "#D185B0", "#7E82BB"], isPro: true },
+        { name: "チューリップブーケ", en: "Tulip Mimosa", colors: ["#E6E797", "#C5B6D3", "#E393A5"], isPro: true }
+      ]
+    };
+
+    let currentCategory = 'nature';
+    let selectedPalette = ALL_PALETTES.nature[0];
+
+    function switchCategory(catKey) {
+      currentCategory = catKey;
+      ['nature', 'cloud', 'retro', 'flower'].forEach(key => {
+        const btn = document.getElementById('ptab-' + key);
+        if (btn) btn.className = 'palette-tab-btn' + (key === catKey ? ' active' : '');
+      });
+      renderPalettes();
+    }
+
+    function renderPalettes() {
+      const container = document.getElementById('palette-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const list = ALL_PALETTES[currentCategory] || [];
+      list.forEach(p => {
+        const item = document.createElement('div');
+        const isSelected = (p.name === selectedPalette.name);
+        const displayName = (currentLang === 'ja') ? p.name : p.en;
+        const locked = p.isPro && !isProUser;
+
+        item.className = 'palette-item' + (isSelected ? ' active' : '') + (locked ? ' locked' : '');
+        item.innerHTML = `
+          <span class="palette-name">${locked ? '🔒 ' : ''}${displayName}</span>
+          <div class="palette-dots">
+            <span class="dot" style="background-color: ${p.colors[0]};"></span>
+            <span class="dot" style="background-color: ${p.colors[1]};"></span>
+            <span class="dot" style="background-color: ${p.colors[2]};"></span>
+          </div>
+        `;
+        item.onclick = function() {
+          if (locked) {
+            showToast(currentLang === 'ja' ? '🔒 Pro限定カラー（上のライセンスから解除可）' : '🔒 Pro exclusive color');
+            return;
+          }
+          selectedPalette = p;
+          renderPalettes();
+          buildPrompt();
+          showToast(`「${displayName}」`);
+        };
+        container.appendChild(item);
+      });
+    }
+
+    const FEATURE_PROMPTS = {
+      tabs: { ja: '・画面下にiOS風のアイコン付きタブバーを配置し、画面がスムーズに切り替わるようにしてください。', en: '・Add an iOS-style bottom navigation bar with icons.' },
+      voice: { ja: '・入力欄の横にマイクボタンを置き、ブラウザの音声認識（webkitSpeechRecognition）で喋るだけで文字入力できるようにしてください。', en: '・Add a microphone button for one-tap voice-to-text input using webkitSpeechRecognition.' },
+      pullrefresh: { ja: '・リスト画面で画面を下に引っ張って離すと更新される操作を実装してください。', en: '・Implement pull-to-refresh on lists.' },
+      swipe: { ja: '・カードや項目を左スワイプすると削除ボタンが現れる操作を実装してください。', en: '・Implement swipe-to-delete on cards.' },
+      vibrate: { ja: '・ボタンタップや完了時に微振動が返るようにしてください。', en: '・Trigger light vibration on button clicks.' },
+      pasteimg: { ja: '・画像の直接貼り付け（ペースト）でも読み込めるようにしてください。', en: '・Allow direct image paste (Ctrl+V) from clipboard.' },
+      calc: { ja: '・リストの数値データ（金額や個数など）を自動で集計し、画面下部に「合計金額：¥◯◯」や「平均：◯◯」をリアルタイム表示する計算バーを設置してください。', en: '・Add an auto-calculation bar at the bottom showing realtime sum totals and averages of numerical items.' },
+      chart: { ja: '・数値データを視覚化する見やすいグラフを表示してください。', en: '・Display cute statistics charts.' },
+      toast: { ja: '・操作成功時に可愛い通知トーストをふわっと出してください。', en: '・Show smooth toast alerts on action success.' },
+      calendar: { ja: '・月間カレンダーを表示し、日付をタップするとその日のデータやメモを確認・記録できるようにしてください。', en: '・Display an interactive monthly calendar where tapping a day allows viewing and logging entries.' },
+      storage: { ja: '・登録データはブラウザのLocalStorageに保存してください。', en: '・Save data automatically to localStorage.' },
+      search: { ja: '・上部に検索バーを置きリアルタイムに絞り込めるようにしてください。', en: '・Provide realtime search filtering at the top.' },
+      passcode: { ja: '・起動時に4桁の暗証番号を入力するロック画面を挟んでください。', en: '・Add a 4-digit passcode lock screen.' },
+      export: { ja: '・全データをCSV/JSONで書き出し保存できる機能をつけてください。', en: '・Add export data to CSV/JSON file button.' },
+      darkmode: { ja: '・ダークモードとライトモードが切り替わるようにしてください。', en: '・Add dark/light theme switcher.' }
+    };
+
+    function buildPrompt() {
+      const idea = document.getElementById('user-idea').value.trim() || (currentLang === 'ja' ? 'アプリ' : 'Web App');
+      const paletteName = (currentLang === 'ja') ? selectedPalette.name : selectedPalette.en;
+      const featuresText = selectedFeatures.map(k => FEATURE_PROMPTS[k][currentLang]).join('\n');
+      
+      const customNoteVal = document.getElementById('custom-note') ? document.getElementById('custom-note').value.trim() : '';
+      let customSection = '';
+      if (customNoteVal) {
+        if (currentLang === 'ja') {
+          customSection = `\n\n【自由なこだわり要望（最優先で反映してください）】：\n・${customNoteVal.replace(/\n/g, '\n・')}`;
+        } else {
+          customSection = `\n\n【Custom User Preferences (High Priority)】:\n・${customNoteVal.replace(/\n/g, '\n・')}`;
+        }
+      }
+
+      let prompt = '';
+      if (currentLang === 'ja') {
+        prompt = `スマホで動くWebアプリを作りたいです。\n\n`
+          + `【作りたいもの】：\n${idea}\n\n`
+          + `【配色パレット（${paletteName}）】：\n`
+          + `・カラー1: ${selectedPalette.colors[0]} （背景・ベース色）\n`
+          + `・カラー2: ${selectedPalette.colors[1]} （サブパーツ・枠線）\n`
+          + `・カラー3: ${selectedPalette.colors[2]} （ボタン・アクセント強調色）\n\n`
+          + `【機能・レイアウト要件】：\n${featuresText}`
+          + `${customSection}\n\n`
+          + `・外部ファイルに分割せず、1つのHTMLファイル内にHTML・CSS・JavaScriptをすべて埋め込んで出力してください。\n`
+          + `・余計な挨拶や解説は省き、完成したHTMLコードのみをコードブロックで出力してください。`;
+      } else {
+        prompt = `I want to build a mobile web app.\n\n`
+          + `【App Concept】：\n${idea}\n\n`
+          + `【Color Palette (${paletteName})】：\n`
+          + `・Color 1: ${selectedPalette.colors[0]} (Background / Card Base)\n`
+          + `・Color 2: ${selectedPalette.colors[1]} (Sub-components / Borders)\n`
+          + `・Color 3: ${selectedPalette.colors[2]} (Main Action Buttons / Accents)\n\n`
+          + `【Requirements & Features】：\n${featuresText}`
+          + `${customSection}\n\n`
+          + `・Keep all HTML, CSS, and JavaScript in one single complete HTML file.\n`
+          + `・Output only the full working code without conversational chatter.`;
+      }
+
+      document.getElementById('prompt-box').value = prompt;
+    }
+
+    function copyPrompt() {
+      const textarea = document.getElementById('prompt-box');
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      try {
+        navigator.clipboard.writeText(textarea.value);
+        showToast(currentLang === 'ja' ? 'コピー完了！' : 'Copied!');
+      } catch (e) {
+        document.execCommand('copy');
+        showToast(currentLang === 'ja' ? 'コピーしました！' : 'Copied!');
+      }
+    }
+
+    function copyFullCode() {
+      const textarea = document.getElementById('app-code');
+      if (!textarea.value.trim()) {
+        showToast(currentLang === 'ja' ? 'コピーするコードがありません' : 'No code to copy');
+        return;
+      }
+      try {
+        navigator.clipboard.writeText(textarea.value);
+        showToast(currentLang === 'ja' ? '📑 コード全体をコピーしました！' : '📑 Full code copied!');
+      } catch(e) {
+        textarea.select();
+        document.execCommand('copy');
+        showToast(currentLang === 'ja' ? '📑 コード全体をコピーしました！' : '📑 Full code copied!');
+      }
+    }
+
+    async function pasteToEditor() {
+      const textarea = document.getElementById('app-code');
       try {
         if (navigator.clipboard && navigator.clipboard.readText) {
           const text = await navigator.clipboard.readText();
-          if (text && codeInput) {
-            const cleaned = cleanAICode(text);
-            codeInput.value = cleaned;
-            if (lengthIndicator) lengthIndicator.innerText = `${cleaned.length}文字`;
-            try { localStorage.setItem('ai_code_cache', cleaned); } catch(e){}
-            showToast('貼り付け＆コード自動整形しました！');
+          if (text) {
+            textarea.value = text;
+            showToast(currentLang === 'ja' ? '貼り付けました！' : 'Pasted!');
             return;
           }
         }
       } catch (e) {}
-      showToast('長押しして直接ペーストしてください');
-      if (codeInput) codeInput.focus();
+      showToast(currentLang === 'ja' ? '枠内を長押しして貼り付けてください' : 'Tap & hold to paste');
+      textarea.focus();
     }
 
-    // --- 4. プロンプトジェネレーターロジック ---
-    let selectedColor = 'romantic';
-    let selectedFeatures = new Set(['storage', 'tabs']);
-
-    const COLOR_TEXTS = {
-      romantic: '【配色】メイン文字色: #2E2979, ボタン・重要パーツ: #F39DF4, サブアクセント・枠線: #9B95EB, 背景: #FAF9FD (白背景・ロマンティック系)',
-      cyber: '【配色】背景: #181824 (黒背景・青み), 文字色: #F5F5FA, ボタン・リンク: #FB76FB, 強調パーツ: #EC1278, サブ枠線: #8587F8 (ネオン系)',
-      cafe: '【配色】メイン文字: #5A4A42, ボタン: #C49983, 背景: #FAF6F0, カード面: #FFFFFF, 枠線: #EADBC8 (淡色カフェ風)',
-      minimal: '【配色】メイン文字: #111111, ボタン: #000000 (白文字), 背景: #F9FAFB, カード面: #FFFFFF, 枠線: #E5E7EB (洗練されたモノトーン)'
-    };
-
-    const FEATURE_TEXTS = {
-      storage: '・登録したデータはブラウザのLocalStorageに保存し、次回起動時も残るようにしてください。',
-      tabs: '・画面下にiOS風のアイコン付きタブバーを配置し、画面がスムーズに切り替わるようにしてください。',
-      search: '・上部にキーワード検索バーを設置し、登録データをリアルタイムで絞り込めるようにしてください。',
-      darkmode: '・ライトモードとダークモードの切り替えボタンを設置し、配色が切り替わるようにしてください。'
-    };
-
-    function setColorTheme(themeKey, btn) {
-      selectedColor = themeKey;
-      document.querySelectorAll('#color-chips .chip-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      updateGeneratedPrompt();
+    function clearEditor() {
+      const textarea = document.getElementById('app-code');
+      textarea.value = '';
+      showToast(currentLang === 'ja' ? '全消ししました' : 'Cleared');
     }
 
-    function toggleFeature(featureKey, btn) {
-      if (selectedFeatures.has(featureKey)) {
-        selectedFeatures.delete(featureKey);
-        btn.classList.remove('active');
+    function saveApiKey() {
+      const key = document.getElementById('api-key-input').value.trim();
+      localStorage.setItem('webbypop_gemini_key', key);
+      updateApiStatus();
+      showToast(currentLang === 'ja' ? 'キーを保存しました' : 'API Key Saved');
+    }
+
+    function updateApiStatus() {
+      const key = localStorage.getItem('webbypop_gemini_key') || '';
+      const status = document.getElementById('api-status');
+      const input = document.getElementById('api-key-input');
+      if (key) {
+        status.innerText = currentLang === 'ja' ? '✓ 設定済み' : '✓ Ready';
+        status.style.color = 'var(--c2)';
+        if (input) input.value = key;
       } else {
-        selectedFeatures.add(featureKey);
-        btn.classList.add('active');
-      }
-      updateGeneratedPrompt();
-    }
-
-    function updateGeneratedPrompt() {
-      const inputEl = document.getElementById('user-idea-input');
-      const boxEl = document.getElementById('generated-prompt-box');
-      if (!inputEl || !boxEl) return;
-      const userWish = inputEl.value.trim() || '（作りたいアプリの内容）';
-
-      let featurePrompts = Array.from(selectedFeatures).map(k => FEATURE_TEXTS[k]).join('\n');
-
-      const prompt = `iPhoneで動くWebアプリを作りたいです。
-【作りたいもの】：
-${userWish}
-
-【デザイン・配色指定】：
-${COLOR_TEXTS[selectedColor]}
-
-【機能・レイアウト要件】：
-${featurePrompts}
-・Tailwind CSSのCDN（\x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script>）を使用し、iPhoneアプリのようなモダンで美しいUI（角丸、余白、見やすいフォント）にしてください。
-・外部ファイルに分割せず、1つのHTMLファイル内に<!DOCTYPE html>から</html>までHTML・CSS・JavaScriptをすべて埋め込んで出力してください。
-・余計な挨拶や解説は省き、完成したHTMLコードのみをコードブロックで出力してください。`;
-
-      boxEl.value = prompt;
-    }
-
-    function copyGeneratedPrompt() {
-      const boxEl = document.getElementById('generated-prompt-box');
-      if (boxEl) copyDirect(boxEl.value, 'AI指示文をコピーしました！GeminiやChatGPTに送信してください');
-    }
-
-    // --- 5. プレビュー表示 & データ初期化 ---
-    function renderPreview() {
-      const iframe = document.getElementById('preview-iframe');
-      if (!iframe || !codeInput) return;
-
-      let userCode = cleanAICode(codeInput.value.trim());
-      if (!userCode) {
-        userCode = `<!DOCTYPE html>
-        <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">\x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script></head>
-        <body class="p-6 text-center text-slate-500 font-sans flex flex-col items-center justify-center min-h-[320px]">
-          <div class="text-4xl mb-3">📱</div>
-          <p class="font-bold text-slate-700">コードがまだ入力されていません</p>
-          <p class="text-xs text-slate-400 mt-1">「コード」タブでHTMLを貼るか、<br>「骨組み見本」タブから試してみてください。</p>
-        </body></html>`;
-      }
-      iframe.srcdoc = userCode;
-      showToast('プレビューを更新しました');
-    }
-
-    function resetAppData() {
-      const iframe = document.getElementById('preview-iframe');
-      if (!iframe) return;
-      try {
-        iframe.contentWindow.localStorage.clear();
-      } catch(e){}
-      renderPreview();
-      showToast('作成中アプリの保存データを空にして再読込しました');
-    }
-
-    function togglePhoneFrame() {
-      isPhoneFrame = !isPhoneFrame;
-      const container = document.getElementById('device-container');
-      const modeText = document.getElementById('frame-mode-text');
-      if (!container || !modeText) return;
-
-      if (isPhoneFrame) {
-        container.className = "w-full max-w-[390px] h-[640px] bg-black rounded-[42px] p-2.5 shadow-2xl relative border-[3.5px] transition-all duration-300";
-        container.style.borderColor = "var(--device-border)";
-        modeText.innerText = "スマホ枠";
-      } else {
-        container.className = "w-full max-w-full h-[72vh] bg-white rounded-2xl p-0 shadow-lg relative border border-slate-200 transition-all duration-300";
-        container.style.borderColor = "var(--border-main)";
-        modeText.innerText = "全幅表示";
+        status.innerText = currentLang === 'ja' ? '未設定' : 'Not set';
+        status.style.color = 'var(--text-muted)';
       }
     }
 
-    function openStandaloneTab() {
-      if (!codeInput) return;
-      const code = cleanAICode(codeInput.value.trim());
-      if (!code) { showToast('まずはコードを入力してください'); return; }
-      const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
-      window.open(URL.createObjectURL(blob), '_blank');
-    }
+    function openApiHelp() { document.getElementById('api-help-modal').style.display = 'flex'; }
+    function closeApiHelp() { document.getElementById('api-help-modal').style.display = 'none'; }
 
-    // --- 6. 共有リンク発行 (LZ-String圧縮URL) ---
-    function shareAsUrl() {
-      if (!codeInput) return;
-      const code = cleanAICode(codeInput.value.trim());
-      if (!code) { showToast('共有するコードがありません'); return; }
+    async function generateCodeWithAI() {
+      if (!isProUser && genCount <= 0) {
+        showToast(currentLang === 'ja' ? '本日の回数がゼロです。シェアで回復！' : 'No generations left! Share to refill');
+        return;
+      }
+
+      const key = localStorage.getItem('webbypop_gemini_key') || document.getElementById('api-key-input').value.trim();
+      if (!key) {
+        showToast(currentLang === 'ja' ? 'APIキーを設定してください' : 'Please set Gemini API Key');
+        openApiHelp();
+        return;
+      }
+
+      const promptText = document.getElementById('prompt-box').value;
+      const btn = document.getElementById('btn-generate-ai');
+      btn.innerText = currentLang === 'ja' ? '⏳ AI作成中…（約15秒）' : '⏳ Building App...';
+      btn.disabled = true;
 
       try {
-        const compressed = LZString.compressToEncodedURIComponent(code);
-        const shareUrl = `${window.location.origin}${window.location.pathname}#code=${compressed}`;
-        copyDirect(shareUrl, '🔗 共有リンクをコピーしました！友達に送るだけで同じアプリが動きます');
-      } catch(e) {
-        showToast('URLの生成に失敗しました');
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message || 'API error');
+
+        let reply = data.candidates[0].content.parts[0].text;
+        reply = reply.replace(/```html/gi, '').replace(/```/g, '').trim();
+
+        document.getElementById('app-code').value = reply;
+
+        if (!isProUser) {
+          genCount = Math.max(0, genCount - 1);
+          localStorage.setItem('webbypop_gen_count', genCount.toString());
+          updateGenCountUI();
+        }
+
+        showScreen('preview');
+        showToast(currentLang === 'ja' ? '✨ アプリが完成しました！' : '✨ App generated successfully!');
+      } catch (err) {
+        showToast(currentLang === 'ja' ? '生成に失敗しました: キーを確認してください' : 'Failed: Check API key');
+      } finally {
+        btn.innerText = I18N[currentLang].btnGen;
+        btn.disabled = false;
       }
     }
 
-    // --- 7. サンプル骨組み ---
-    const SAMPLES = {
-      bottomnav: `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>基本タブ式アプリ</title>
-  \x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script>
-</head>
-<body class="bg-[#FAF9FD] text-[#2E2979] min-h-screen flex flex-col justify-between font-sans select-none">
-  <header class="bg-white/90 backdrop-blur-md border-b border-[#E5E1F8] px-4 py-3 sticky top-0 z-10 flex items-center justify-between">
-    <h1 class="text-base font-bold" id="header-title">ホーム</h1>
-    <span class="text-xs bg-[#F4F2FC] text-[#F39DF4] font-bold px-2 py-0.5 rounded-full border border-[#E5E1F8]">v1.0</span>
-  </header>
-  <main class="flex-1 p-4 max-w-md w-full mx-auto pb-20">
-    <div id="page-home" class="space-y-3">
-      <div class="bg-white p-5 rounded-2xl border border-[#E5E1F8] shadow-sm">
-        <h2 class="text-sm font-bold">📱 ホーム画面</h2>
-        <p class="text-xs text-[#67619E] mt-1 leading-relaxed">下部のタブバーを押すとページがスムーズに切り替わります。</p>
-      </div>
-    </div>
-    <div id="page-explore" class="hidden space-y-3">
-      <div class="bg-white p-4 rounded-2xl border border-[#E5E1F8] shadow-sm">
-        <h2 class="text-sm font-bold">🔍 見つける</h2>
-        <p class="text-xs text-[#67619E] mt-1">検索やカテゴリ一覧をここに作成できます。</p>
-      </div>
-    </div>
-  </main>
-  <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#E5E1F8] py-2 px-6 flex justify-around items-center max-w-md mx-auto">
-    <button onclick="navigate('home')" id="tab-home" class="flex flex-col items-center gap-0.5 text-[#F39DF4] font-bold text-[10px]"><span class="text-lg">🏠</span><span>ホーム</span></button>
-    <button onclick="navigate('explore')" id="tab-explore" class="flex flex-col items-center gap-0.5 text-[#9590BD] font-medium text-[10px]"><span class="text-lg">🔍</span><span>見つける</span></button>
-  </nav>
-  \x3Cscript>
-    function navigate(id) {
-      ['home', 'explore'].forEach(p => {
-        document.getElementById('page-' + p).classList.toggle('hidden', p !== id);
-        document.getElementById('tab-' + p).className = p === id ? 'flex flex-col items-center gap-0.5 text-[#F39DF4] font-bold text-[10px]' : 'flex flex-col items-center gap-0.5 text-[#9590BD] font-medium text-[10px]';
-      });
-      document.getElementById('header-title').innerText = id === 'home' ? 'ホーム' : '見つける';
-    }
-  \x3C/script>
-</body></html>`,
-
-      cardlist: `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>リスト＆メモ管理</title>
-  \x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script>
-</head>
-<body class="bg-[#FAF9FD] text-[#2E2979] min-h-screen p-4 max-w-md mx-auto font-sans">
-  <div class="space-y-4">
-    <h1 class="text-lg font-bold">📝 リスト・メモ管理</h1>
-    <div class="bg-white p-3 rounded-2xl border border-[#E5E1F8] shadow-sm flex gap-2">
-      <input id="item-input" type="text" placeholder="新しい項目を入力..." class="flex-1 text-xs px-3 py-2 bg-[#F4F2FC] rounded-xl outline-none">
-      <button onclick="addItem()" class="px-4 py-2 bg-[#F39DF4] text-[#2E2979] rounded-xl text-xs font-bold active:scale-95 transition">追加</button>
-    </div>
-    <div id="card-container" class="space-y-2">
-      <div class="bg-white p-3.5 rounded-2xl border border-[#E5E1F8] shadow-xs flex items-center justify-between">
-        <span class="text-xs font-semibold">📌 サンプルメモ 1</span>
-        <button onclick="this.parentElement.remove()" class="text-xs text-rose-500 px-2 py-1">削除</button>
-      </div>
-    </div>
-  </div>
-  \x3Cscript>
-    function addItem() {
-      const input = document.getElementById('item-input');
-      const val = input.value.trim();
-      if (!val) return;
-      const card = document.createElement('div');
-      card.className = "bg-white p-3.5 rounded-2xl border border-[#E5E1F8] shadow-xs flex items-center justify-between";
-      card.innerHTML = '<span class="text-xs font-semibold">📌 ' + val + '</span><button onclick="this.parentElement.remove()" class="text-xs text-rose-500 px-2 py-1">削除</button>';
-      document.getElementById('card-container').appendChild(card);
-      input.value = '';
-    }
-  \x3C/script>
-</body></html>`,
-
-      links: `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>プロフィールリンク</title>
-  \x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script>
-</head>
-<body class="bg-[#FAF9FD] text-[#2E2979] min-h-screen p-4 flex flex-col justify-center items-center font-sans">
-  <div class="max-w-xs w-full bg-white rounded-3xl p-6 shadow-md border border-[#E5E1F8] text-center space-y-4">
-    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-[#9B95EB] to-[#F39DF4] p-1 shadow-sm">
-      <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl">🌟</div>
-    </div>
-    <h1 class="text-base font-bold">あなたのお名前</h1>
-    <div class="space-y-2">
-      <a href="#" class="block w-full py-3 px-4 bg-[#F4F2FC] border border-[#E5E1F8] rounded-2xl text-xs font-semibold flex items-center justify-between"><span>📸 Instagram</span><span>→</span></a>
-      <a href="#" class="block w-full py-3 px-4 bg-[#F4F2FC] border border-[#E5E1F8] rounded-2xl text-xs font-semibold flex items-center justify-between"><span>🎨 ポートフォリオ</span><span>→</span></a>
-    </div>
-  </div>
-</body></html>`,
-
-      generator: `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ワンタップ抽選</title>
-  \x3Cscript src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)">\x3C/script>
-</head>
-<body class="bg-[#FAF9FD] text-[#2E2979] min-h-screen p-4 flex flex-col justify-center items-center font-sans select-none">
-  <div class="max-w-xs w-full bg-white rounded-3xl p-6 shadow-lg border border-[#E5E1F8] text-center space-y-5">
-    <h1 class="text-base font-bold">🎲 ワンタップ診断</h1>
-    <div class="bg-[#F4F2FC] border border-[#E5E1F8] rounded-2xl p-6 min-h-[110px] flex flex-col items-center justify-center">
-      <span id="result-icon" class="text-3xl">✨</span>
-      <h2 id="result-text" class="text-sm font-bold mt-1">ボタンを押してね！</h2>
-    </div>
-    <button onclick="drawResult()" class="w-full py-3 bg-[#F39DF4] text-[#2E2979] font-bold text-sm rounded-2xl shadow-md active:scale-95 transition">結果を引く！</button>
-  </div>
-  \x3Cscript>
-    const options = [
-      { text: "大吉！最高の1日になりそう🌸", icon: "🎉" },
-      { text: "中吉！抹茶スイーツを食べると吉🍵", icon: "✨" },
-      { text: "小吉！ゆっくりお昼寝しよう💤", icon: "🌱" }
-    ];
-    function drawResult() {
-      const r = options[Math.floor(Math.random() * options.length)];
-      document.getElementById('result-text').innerText = r.text;
-      document.getElementById('result-icon').innerText = r.icon;
-    }
-  \x3C/script>
-</body></html>`
-    };
-
-    function loadSample(key) {
-      if (SAMPLES[key] && codeInput) {
-        codeInput.value = SAMPLES[key].trim();
-        if (lengthIndicator) lengthIndicator.innerText = `${codeInput.value.length}文字`;
-        try { localStorage.setItem('ai_code_cache', codeInput.value); } catch(e){}
-        showToast('サンプルを読み込みました');
-      }
-    }
-
-    function loadSampleAndGo(key) {
-      loadSample(key);
-      switchTab('preview');
-    }
-
-    // --- 8. エクスポート & プロジェクト保存 ---
     function downloadHtmlFile() {
-      if (!codeInput) return;
-      const code = cleanAICode(codeInput.value.trim());
-      if (!code) { showToast('保存するコードがありません'); return; }
+      const code = document.getElementById('app-code').value;
+      if (!code.trim()) {
+        showToast(currentLang === 'ja' ? '保存するコードがありません' : 'No code to save');
+        return;
+      }
       const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -813,135 +1273,145 @@ ${featurePrompts}
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      showToast('HTMLファイルをダウンロードしました！');
+      showToast(currentLang === 'ja' ? 'HTMLを保存しました！' : 'HTML downloaded!');
     }
 
-    function copyCurrentCode() {
-      if (!codeInput) return;
-      const code = cleanAICode(codeInput.value.trim());
-      if (!code) { showToast('コピーするコードがありません'); return; }
-      copyDirect(code, 'コードをクリップボードにコピーしました！');
+    function shareDirectUrl() {
+      const code = document.getElementById('app-code').value.trim();
+      if (!code) {
+        showToast(currentLang === 'ja' ? '共有するコードがありません' : 'No code to share');
+        return;
+      }
+      try {
+        const compressed = LZString.compressToEncodedURIComponent(code);
+        const shareUrl = `${window.location.origin}${window.location.pathname}#code=${compressed}`;
+        navigator.clipboard.writeText(shareUrl);
+        showToast(currentLang === 'ja' ? '🔗 共有URLをコピーしました！' : '🔗 Copied share link!');
+      } catch(e) {
+        showToast('URLの生成に失敗しました');
+      }
     }
 
-    function copyDirect(text, msg) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); showToast(msg); } catch(e){}
-      document.body.removeChild(ta);
-    }
+    function saveCurrentProject() {
+      const code = document.getElementById('app-code').value;
+      if (!code.trim()) {
+        showToast(currentLang === 'ja' ? '保存するコードがありません' : 'No code to save');
+        return;
+      }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      const text = document.getElementById('toast-text');
-      if (!toast || !text) return;
-      text.innerText = msg;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2400);
-    }
+      const list = JSON.parse(localStorage.getItem('webbypop_projects') || '[]');
+      if (!isProUser && list.length >= 3) {
+        showToast(currentLang === 'ja' ? '無料版は3個まで保存可能です' : 'Free tier limited to 3 saves');
+        return;
+      }
 
-    function saveCurrentCodeAsProject() {
-      const code = cleanAICode(codeInput.value.trim());
-      if (!code) { showToast('保存するコードがありません'); return; }
-      const modal = document.getElementById('save-project-modal');
-      const input = document.getElementById('save-project-name');
-      input.value = `マイアプリ ${new Date().toLocaleDateString('ja-JP')}`;
-      modal.classList.remove('hidden');
-    }
+      const title = prompt(currentLang === 'ja' ? 'アプリの名前をつけてください' : 'App Title:', `My App ${new Date().toLocaleDateString()}`);
+      if (!title) return;
 
-    function closeSaveModal() {
-      document.getElementById('save-project-modal').classList.add('hidden');
-    }
-
-    function confirmSaveProject() {
-      const code = cleanAICode(codeInput.value.trim());
-      const title = document.getElementById('save-project-name').value.trim() || 'マイアプリ';
-      const projects = JSON.parse(localStorage.getItem('ai_saved_projects') || '[]');
-      projects.unshift({ id: Date.now(), title, code, date: new Date().toLocaleDateString('ja-JP') });
-      localStorage.setItem('ai_saved_projects', JSON.stringify(projects.slice(0, 10)));
-      closeSaveModal();
+      list.unshift({ id: Date.now(), title, code, date: new Date().toLocaleDateString() });
+      localStorage.setItem('webbypop_projects', JSON.stringify(list));
       renderSavedProjects();
-      showToast('プロジェクトを保存しました！');
+      showToast(currentLang === 'ja' ? '端末に保存しました！' : 'Project saved!');
     }
 
     function renderSavedProjects() {
-      const container = document.getElementById('saved-projects-list');
-      if (!container) return;
-      const projects = JSON.parse(localStorage.getItem('ai_saved_projects') || '[]');
-      if (projects.length === 0) {
-        container.innerHTML = `<div class="theme-card p-4 rounded-2xl border border-dashed text-center text-xs text-[var(--text-muted)]">保存されたプロジェクトはまだありません</div>`;
+      const box = document.getElementById('saved-projects-list');
+      if (!box) return;
+      let list = [];
+      try { list = JSON.parse(localStorage.getItem('webbypop_projects') || '[]'); } catch(e){}
+
+      if (list.length === 0) {
+        box.innerHTML = `<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px;">${currentLang === 'ja' ? '保存されたプロジェクトはありません' : 'No saved projects yet'}</div>`;
         return;
       }
-      container.innerHTML = projects.map(p => `
-        <div class="theme-card p-3 rounded-2xl border shadow-xs flex items-center justify-between">
-          <div class="space-y-0.5 max-w-[200px]">
-            <h4 class="text-xs font-bold text-[var(--text-main)] truncate">${p.title}</h4>
-            <span class="text-[10px] text-[var(--text-muted)] font-mono">${p.date} (${p.code.length}文字)</span>
-          </div>
-          <div class="flex items-center space-x-1.5">
-            <button onclick="loadSavedProject(${p.id})" class="px-2.5 py-1 rounded-lg text-xs font-bold active:scale-95 transition border border-[var(--border-accent)]" style="background-color: var(--bg-card-sub); color: var(--c-accent1);">開く</button>
-            <button onclick="deleteProject(${p.id})" class="p-1 text-[var(--text-muted)] hover:text-[#EC1278]"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-          </div>
+      box.innerHTML = list.map(item => `
+        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-sub);padding:8px 12px;border-radius:12px;margin-bottom:6px;font-size:11px;border:1px solid var(--border-color);">
+          <div><b>${item.title}</b> <span style="color:var(--text-muted);font-size:9px;">(${item.date})</span></div>
+          <button class="chip" style="padding:4px 8px;font-size:10px;" onclick="loadProject(${item.id})">${currentLang === 'ja' ? '開く' : 'Open'}</button>
         </div>
       `).join('');
-      if (window.lucide) lucide.createIcons();
     }
 
-    function loadSavedProject(id) {
-      const projects = JSON.parse(localStorage.getItem('ai_saved_projects') || '[]');
-      const target = projects.find(p => p.id === id);
-      if (target && codeInput) {
-        codeInput.value = target.code;
-        lengthIndicator.innerText = `${target.code.length}文字`;
-        try { localStorage.setItem('ai_code_cache', target.code); } catch(e){}
-        switchTab('preview');
-        showToast(`「${target.title}」を読み込みました`);
+    function loadProject(id) {
+      try {
+        const list = JSON.parse(localStorage.getItem('webbypop_projects') || '[]');
+        const target = list.find(p => p.id === id);
+        if (target) {
+          document.getElementById('app-code').value = target.code;
+          showScreen('preview');
+          showToast(currentLang === 'ja' ? `「${target.title}」を読み込みました` : `Loaded: ${target.title}`);
+        }
+      } catch(e){}
+    }
+
+    function previewApp() { showScreen('preview'); }
+
+    function renderPreview() {
+      const code = document.getElementById('app-code').value;
+      const iframe = document.getElementById('preview-frame');
+      if (!code.trim()) {
+        iframe.srcdoc = '<div style="padding:24px;text-align:center;color:#67619E;font-family:sans-serif;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;"><div>📱</div><div style="font-weight:bold;margin-top:8px;">コードがまだありません</div><div style="font-size:11px;margin-top:4px;">「コード」タブに貼り付けてください！</div></div>';
+      } else {
+        iframe.srcdoc = code;
       }
     }
 
-    function deleteProject(id) {
-      let projects = JSON.parse(localStorage.getItem('ai_saved_projects') || '[]');
-      projects = projects.filter(p => p.id !== id);
-      localStorage.setItem('ai_saved_projects', JSON.stringify(projects));
-      renderSavedProjects();
-      showToast('削除しました');
+    let isPhoneFrame = true;
+    function togglePhoneFrame() {
+      isPhoneFrame = !isPhoneFrame;
+      const mockup = document.getElementById('device-mockup');
+      const btn = document.getElementById('btn-toggle-frame');
+      if (isPhoneFrame) {
+        mockup.className = 'phone-mockup';
+        btn.innerText = I18N[currentLang].btnFrame;
+      } else {
+        mockup.className = 'phone-mockup wide-mode';
+        btn.innerText = currentLang === 'ja' ? '🖥 全幅表示' : '🖥 Wide View';
+      }
     }
 
-    // --- 9. 起動初期化 & URLハッシュからの復元 ---
-    window.addEventListener('DOMContentLoaded', () => {
-      let savedTheme = 'light';
-      try {
-        savedTheme = localStorage.getItem('webbypop_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      } catch(e){}
-      applyTheme(savedTheme === 'dark');
+    function openFullscreen() {
+      const code = document.getElementById('app-code').value;
+      if (!code.trim()) {
+        showToast(currentLang === 'ja' ? 'コードがありません' : 'No code found');
+        return;
+      }
+      const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+      window.open(URL.createObjectURL(blob), '_blank');
+    }
 
-      // 共有リンク（#code=...）から開かれた場合の自動展開
+    let toastTimer = null;
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 1400);
+    }
+
+    window.addEventListener('load', () => {
+      initTheme();
+
       if (window.location.hash.startsWith('#code=')) {
         try {
-          const compressed = window.location.hash.replace('#code=', '');
-          const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
-          if (decompressed && codeInput) {
-            codeInput.value = decompressed;
-            lengthIndicator.innerText = `${decompressed.length}文字`;
-            switchTab('preview');
-            showToast('共有リンクからアプリを読み込みました！✨');
-            history.replaceState(null, '', window.location.pathname);
+          const comp = window.location.hash.replace('#code=', '');
+          const decomp = LZString.decompressFromEncodedURIComponent(comp);
+          if (decomp) {
+            document.getElementById('app-code').value = decomp;
+            showScreen('preview');
+            showToast('🔗 共有リンクから開きました');
           }
         } catch(e){}
-      } else {
-        const cached = localStorage.getItem('ai_code_cache');
-        if (cached && codeInput) {
-          codeInput.value = cached;
-          lengthIndicator.innerText = `${cached.length}文字`;
-        } else {
-          loadSample('bottomnav');
-        }
       }
 
-      updateGeneratedPrompt();
+      applyLanguage();
+      updateProUI();
+      renderTemplates();
+      renderPalettes();
+      renderFeatureChips();
+      buildPrompt();
+      updateApiStatus();
       renderSavedProjects();
-      if (window.lucide) lucide.createIcons();
     });
   </script>
 </body>
